@@ -4,6 +4,8 @@ import { dateKey, HOUR_MS } from './time'
 
 export interface DaySlice {
   date: string
+  start: number
+  end: number
   ms: number
 }
 
@@ -19,7 +21,7 @@ export function splitSession(session: Session): DaySlice[] {
     const nextMidnight = dayjs(cursor).add(1, 'day').startOf('day').valueOf()
     const end = Math.min(session.end, nextMidnight)
     if (end <= cursor) break
-    slices.push({ date: dateKey(cursor), ms: end - cursor })
+    slices.push({ date: dateKey(cursor), start: cursor, end, ms: end - cursor })
     cursor = end
   }
   return slices

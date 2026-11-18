@@ -44,14 +44,17 @@ export function MonthView() {
   const selected =
     picked && picked.startsWith(month) ? picked : today.startsWith(month) ? today : null
 
-  const selectedSessions = selected
+  const selectedRows = selected
     ? allSessions
-        .filter((session) => splitSession(session).some((slice) => slice.date === selected))
-        .sort((a, b) => a.start - b.start)
+        .flatMap((session) => {
+          const slice = splitSession(session).find((item) => item.date === selected)
+          return slice ? [{ session, slice }] : []
+        })
+        .sort((a, b) => a.slice.start - b.slice.start)
     : []
   const selectedMs = selected ? (stats.byDate.get(selected) ?? 0) : 0
-  const hasCrossDay = selectedSessions.some(
-    (session) => dateKey(session.start) !== dateKey(session.end),
+  const hasCrossDay = selectedRows.some(
+    ({ session }) => dateKey(session.start) !== dateKey(session.end),
   )
 
   const handleDelete = (session: Session) => {
@@ -140,7 +143,7 @@ export function MonthView() {
             </h2>
             <p className={styles.panelMeta}>
               {selected
-                ? `${selectedSessions.length} 段 · ${formatDuration(selectedMs)}`
+                ? `${selectedRows.length} 段 · ${formatDuration(selectedMs)}`
                 : '点击日历里的任意一天'}
             </p>
           </div>
@@ -156,14 +159,17 @@ export function MonthView() {
           ) : null}
         </header>
 
-        {selected && selectedSessions.length > 0 ? (
+        {selected && selectedRows.length > 0 ? (
           <ul className={styles.list}>
-            {selectedSessions.map((session) => (
+            {selectedRows.map(({ session, slice }) => (
               <SessionRow
                 key={session.id}
                 session={session}
                 now={now}
                 running={session.id === active?.id}
+                rangeStart={slice.start}
+                rangeEnd={slice.end}
+                crossDay={dateKey(session.start) !== dateKey(session.end)}
                 onEdit={session.id === active?.id ? undefined : () => openEditor({ session })}
                 onDelete={session.id === active?.id ? undefined : () => handleDelete(session)}
               />

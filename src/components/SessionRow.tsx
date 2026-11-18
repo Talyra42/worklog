@@ -7,19 +7,35 @@ interface SessionRowProps {
   session: Session
   now?: number
   running?: boolean
+  /** Show only this part of the session (used by the monthly day detail). */
+  rangeStart?: number
+  rangeEnd?: number
+  /** Marks a session that continues into another day. */
+  crossDay?: boolean
   onEdit?: () => void
   onDelete?: () => void
 }
 
-export function SessionRow({ session, now, running = false, onEdit, onDelete }: SessionRowProps) {
-  const end = running ? Math.max(now ?? session.end, session.start) : session.end
-  const crossesMidnight = dateKey(session.start) !== dateKey(end)
-  const duration = Math.max(0, end - session.start)
+export function SessionRow({
+  session,
+  now,
+  running = false,
+  rangeStart,
+  rangeEnd,
+  crossDay = false,
+  onEdit,
+  onDelete,
+}: SessionRowProps) {
+  const start = rangeStart ?? session.start
+  const end = running ? Math.max(now ?? session.end, start) : (rangeEnd ?? session.end)
+  const clipped = rangeStart !== undefined || rangeEnd !== undefined
+  const crossesMidnight = !clipped && dateKey(session.start) !== dateKey(end)
+  const duration = Math.max(0, end - start)
 
   return (
     <li className={running ? `${styles.row} ${styles.running}` : styles.row}>
       <span className={styles.time}>
-        {formatTime(session.start)}
+        {formatTime(start)}
         <span className={styles.dash}>–</span>
         {formatTime(end)}
         {crossesMidnight ? (
@@ -27,6 +43,7 @@ export function SessionRow({ session, now, running = false, onEdit, onDelete }: 
             +1
           </sup>
         ) : null}
+        {crossDay ? <span className={styles.crossTag}>跨天</span> : null}
       </span>
 
       {running ? (

@@ -45,6 +45,19 @@
   margin-left: 2px;
 }
 
+.crossTag {
+  align-self: center;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--surface-soft);
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
 .duration {
   margin-left: auto;
   color: var(--muted);
