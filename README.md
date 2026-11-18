@@ -55,7 +55,8 @@ Worklog 只做一件事：**记录你什么时候在工作**。
 需要 Node.js ≥ 22 与 pnpm。
 
 ```bash
-git clone git@github.com:Talyra42/worklog.git
+git clone https://github.com/Talyra42/worklog.git
+# 或者用 SSH：git clone git@github.com:Talyra42/worklog.git
 cd worklog
 pnpm install
 pnpm dev        # http://localhost:5173
