@@ -4,7 +4,7 @@ import { RingTimer } from '../components/RingTimer'
 import { SessionRow } from '../components/SessionRow'
 import { StatCard } from '../components/StatCard'
 import { useNow } from '../hooks/useNow'
-import { monthStats, msInWindow } from '../lib/stats'
+import { monthStats, msInWindow, splitSession } from '../lib/stats'
 import {
   dateKey,
   formatDayLabel,
@@ -49,10 +49,14 @@ export function TodayView() {
   const weekMs = msInWindow(allSessions, startOfWeek(now), now)
   const month = monthStats(allSessions, monthKey(now))
 
-  const todaySessions = sessions
-    .filter((session) => session.end > todayStart)
-    .sort((a, b) => b.start - a.start)
-  const rowCount = todaySessions.length + (running ? 1 : 0)
+  const todayKey = dateKey(now)
+  const todayRows = sessions
+    .flatMap((session) => {
+      const slice = splitSession(session).find((item) => item.date === todayKey)
+      return slice ? [{ session, slice }] : []
+    })
+    .sort((a, b) => b.slice.start - a.slice.start)
+  const rowCount = todayRows.length + (running ? 1 : 0)
 
   const activeMs = active ? Math.max(0, now - active.start) : 0
   const suspicious = active !== null && activeMs > SUSPICIOUS_MS
@@ -195,10 +199,13 @@ export function TodayView() {
         ) : (
           <ul className={styles.list}>
             {running ? <SessionRow session={running} now={now} running /> : null}
-            {todaySessions.map((session) => (
+            {todayRows.map(({ session, slice }) => (
               <SessionRow
                 key={session.id}
                 session={session}
+                rangeStart={slice.start}
+                rangeEnd={slice.end}
+                crossDay={dateKey(session.start) !== dateKey(session.end)}
                 onEdit={() => openEditor({ session })}
                 onDelete={() => handleDelete(session)}
               />
