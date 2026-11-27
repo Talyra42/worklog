@@ -54,7 +54,7 @@ Worklog 是纯静态 SPA，Vercel 只负责托管文件，**不会转发 Supabas
 | 对象                      | 作用                                                      |
 | ------------------------- | --------------------------------------------------------- |
 | `public.worklog_sessions` | 每条工时记录一行；`end_ms IS NULL` 表示正在计时           |
-| `public.worklog_profiles` | 每个用户的每日目标、主题等设置                            |
+| `public.worklog_profiles` | 每个用户的每日目标设置                                    |
 | RLS 策略                  | 用户只能读写 `auth.uid() = user_id` 的行                  |
 | 部分唯一索引              | 每个用户同时最多只有一段进行中的计时                      |
 | 触发器                    | 新用户注册时自动创建 profile；更新时自动维护 `updated_at` |
@@ -165,7 +165,7 @@ pnpm dev
 - **云端是唯一数据源**：登录后从 `worklog_sessions` 拉取；浏览器不再持久化工时记录。
 - **RLS**：没有登录、或者用别人的 token，都读不到任何行。
 - **登录凭证**：Supabase JS 会把 session token 放在浏览器 `localStorage`（key 以 `sb-` 开头），这是登录态，不是工时数据。
-- **主题偏好**：本地 `worklog.theme` + 云端 profile 同步，只影响外观。
+- **主题偏好**：本地 `worklog.themeMode`，默认跟随系统，可切换浅色 / 深色；不上传云端。
 - **删除账号**：在 Supabase Dashboard → Authentication → Users 删除用户，数据库里的记录会通过 `on delete cascade` 一起删除。
 - **并发修改**：两台设备同时修改同一条记录时，以最后一次写入为准（last-write-wins）；随后的 Realtime 推送会统一两边的画面。
 

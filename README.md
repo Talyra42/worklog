@@ -14,7 +14,7 @@
 [![Zustand 5](https://img.shields.io/badge/Zustand-5-2f2f2f?style=flat-square)](https://zustand.docs.pmnd.rs)
 [![Supabase](https://img.shields.io/badge/cloud-Supabase-3ecf8e?logo=supabase&logoColor=white&style=flat-square)](https://supabase.com)
 [![SCSS Modules](https://img.shields.io/badge/SCSS-Modules-CF649A?logo=sass&logoColor=white&style=flat-square)](https://sass-lang.com)
-[![Live](https://img.shields.io/badge/live-worklog.talyra42.top-c44a23?style=flat-square&logo=vercel&logoColor=white)](https://worklog.talyra42.top)
+[![Live](https://img.shields.io/badge/live-worklog.talyra42.top-008cff?style=flat-square&logo=vercel&logoColor=white)](https://worklog.talyra42.top)
 
 <sub>在线使用：<a href="https://worklog.talyra42.top">worklog.talyra42.top</a></sub>
 
@@ -43,19 +43,19 @@ Worklog 只做一件事：**记录你什么时候在工作**。
 
 ## 功能
 
-|                    |                                                                |
-| ------------------ | -------------------------------------------------------------- |
-| ☁️ **云端存储**    | 记录默认保存在 Supabase，浏览器不再保存工时副本                |
-| 🔐 **账号隔离**    | 邮箱 + 密码登录；Row Level Security 保证只能读写自己的数据     |
-| 🔄 **实时同步**    | 换设备、开两个标签页都能实时看到变化；窗口聚焦时自动补齐       |
-| 🕒 **一键打卡**    | 开始 / 结束一段工作，刷新或关闭页面都不会丢失正在进行的计时    |
-| 📊 **今日概览**    | 本次计时、今日 / 本周 / 本月 / 日均，配合每日目标进度环        |
-| 🗓️ **月度热力图**  | 整月一张图，颜色越深工时越长；点选某天查看或补录               |
-| 🌙 **跨零点处理**  | 22:30–01:10 会自动拆分到两天，日统计不会多算                   |
-| ✍️ **手动补录**    | 忘记打卡时补一段；默认落在最近的空闲时段，并校验重叠与未来时间 |
-| 🔔 **忘关提醒**    | 一段计时超过 16 小时会提醒，可结束或作废                       |
-| 💾 **导入导出**    | JSON（含设置）与 CSV；导入按 id 去重合并                       |
-| 🎨 **深色 / 浅色** | 跟随系统，也可手动切换；桌面与手机都有对应布局                 |
+|                   |                                                                |
+| ----------------- | -------------------------------------------------------------- |
+| ☁️ **云端存储**   | 记录默认保存在 Supabase，浏览器不再保存工时副本                |
+| 🔐 **账号隔离**   | 邮箱 + 密码登录；Row Level Security 保证只能读写自己的数据     |
+| 🔄 **实时同步**   | 换设备、开两个标签页都能实时看到变化；窗口聚焦时自动补齐       |
+| 🕒 **一键打卡**   | 开始 / 结束一段工作，刷新或关闭页面都不会丢失正在进行的计时    |
+| 📊 **今日概览**   | 本次计时、今日 / 本周 / 本月 / 日均，配合每日目标进度环        |
+| 🗓️ **月度热力图** | 整月一张图，颜色越深工时越长；点选某天查看或补录               |
+| 🌙 **跨零点处理** | 22:30–01:10 会自动拆分到两天，日统计不会多算                   |
+| ✍️ **手动补录**   | 忘记打卡时补一段；默认落在最近的空闲时段，并校验重叠与未来时间 |
+| 🔔 **忘关提醒**   | 一段计时超过 16 小时会提醒，可结束或作废                       |
+| 💾 **导入导出**   | JSON（含设置）与 CSV；导入按 id 去重合并                       |
+| 🎨 **三种主题**   | 跟随系统 / 浅色 / 深色；桌面与手机都有对应布局                 |
 
 ## 快速开始
 
@@ -72,7 +72,7 @@ cp .env.example .env.local
 然后按 **[docs/supabase-setup.md](docs/supabase-setup.md)** 做三件事：
 
 1. 在 Supabase SQL Editor 执行 [`supabase/migrations/0001_worklog_cloud.sql`](supabase/migrations/0001_worklog_cloud.sql)；
-2. 把 Project URL 和 anon key 填进 `.env.local`；
+2. 把 Project URL 和 publishable / anon key 填进 `.env.local`；
 3. 启动开发服务器。
 
 ```bash
@@ -94,7 +94,7 @@ pnpm preview
 - 忘记打卡时用「补录」，或者在「月度」页点选某一天补录。
 - 「每日目标」默认 8 小时，可在计时卡片右下角调整，会同步到云端。
 - 所有记录都可以在「记录」页编辑、删除、导出。
-- 侧边栏会显示同步状态和当前登录邮箱；退出登录不会删除云端数据。
+- 桌面侧边栏、移动端账户面板会显示同步状态和当前登录邮箱；退出登录不会删除云端数据。
 
 ## 数据与隐私
 
@@ -102,8 +102,8 @@ pnpm preview
 - 所有表都开启 Row Level Security，策略是 `auth.uid() = user_id`；未登录或换账号都读不到别人的行。
 - 浏览器只保留两类本地数据：
   - Supabase 的登录 token（`sb-...` key），用于保持登录态；
-  - 主题偏好（`worklog.theme`）。
-- 前端只使用 `anon` key。**不要把 `service_role` key 放进前端或提交到仓库**。
+  - 主题偏好（`worklog.themeMode`，默认跟随系统）。
+- 前端只使用 `publishable` / `anon` key。**不要把 `secret` / `service_role` key 放进前端或提交到仓库**。
 - 清理浏览器数据不会丢记录，重新登录即可从云端恢复。
 - 仍然建议定期在「记录」页导出 JSON 备份；免费 Supabase 项目长期闲置会被暂停。
 

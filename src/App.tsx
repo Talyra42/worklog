@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { AuthScreen } from './components/AuthScreen'
 import { CloudStatusScreen } from './components/CloudStatusScreen'
 import { ConfirmDialog } from './components/ConfirmDialog'
+import { MobileChrome } from './components/MobileChrome'
 import { SessionDialog } from './components/SessionDialog'
 import { Sidebar } from './components/Sidebar'
 import { ToastHost } from './components/ToastHost'
@@ -18,6 +19,8 @@ import styles from './App.module.scss'
 export default function App() {
   const view = useWorklog((state) => state.view)
   const theme = useWorklog((state) => state.theme)
+  const themeMode = useWorklog((state) => state.themeMode)
+  const refreshSystemTheme = useWorklog((state) => state.refreshSystemTheme)
   const status = useWorklog((state) => state.status)
   const loadError = useWorklog((state) => state.loadError)
   const load = useWorklog((state) => state.load)
@@ -35,6 +38,14 @@ export default function App() {
   useEffect(() => {
     document.documentElement.dataset.theme = theme
   }, [theme])
+
+  useEffect(() => {
+    if (themeMode !== 'system') return
+    const media = window.matchMedia('(prefers-color-scheme: dark)')
+    const onChange = () => refreshSystemTheme()
+    media.addEventListener('change', onChange)
+    return () => media.removeEventListener('change', onChange)
+  }, [themeMode, refreshSystemTheme])
 
   if (!isSupabaseConfigured) {
     return (
@@ -79,6 +90,7 @@ export default function App() {
   return (
     <div className={styles.app}>
       <Sidebar />
+      <MobileChrome />
 
       <main className={styles.main}>
         <div key={view} className={styles.view}>

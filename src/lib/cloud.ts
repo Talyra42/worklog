@@ -1,4 +1,4 @@
-import type { ActiveSession, Session, Theme } from '../types'
+import type { ActiveSession, Session } from '../types'
 import { supabase } from './supabase'
 
 /** One row of `public.worklog_sessions`. `end_ms === null` means "running". */
@@ -12,11 +12,10 @@ export interface SessionRow {
 export interface ProfileRow {
   user_id: string
   daily_goal_minutes: number
-  theme: Theme
 }
 
 export const SESSION_COLUMNS = 'id,user_id,start_ms,end_ms'
-export const PROFILE_COLUMNS = 'user_id,daily_goal_minutes,theme'
+export const PROFILE_COLUMNS = 'user_id,daily_goal_minutes'
 
 const asNumber = (value: number | string | null): number => Number(value)
 
@@ -89,10 +88,10 @@ export async function fetchCloud(userId: string): Promise<CloudSnapshot> {
  * The signup trigger normally creates the profile, but an old/deleted trigger
  * or a manually created user should not lock the app. Insert defaults if needed.
  */
-export async function ensureProfile(userId: string, theme: Theme): Promise<ProfileRow> {
+export async function ensureProfile(userId: string): Promise<ProfileRow> {
   const { error } = await supabase
     .from('worklog_profiles')
-    .upsert({ user_id: userId, theme }, { onConflict: 'user_id', ignoreDuplicates: true })
+    .upsert({ user_id: userId }, { onConflict: 'user_id', ignoreDuplicates: true })
   if (error && !isDuplicateError(error)) throw error
 
   const { data, error: readError } = await supabase
@@ -107,7 +106,7 @@ export async function ensureProfile(userId: string, theme: Theme): Promise<Profi
 
 export async function updateProfile(
   userId: string,
-  patch: Partial<Pick<ProfileRow, 'daily_goal_minutes' | 'theme'>>,
+  patch: Partial<Pick<ProfileRow, 'daily_goal_minutes'>>,
 ): Promise<void> {
   const { error } = await supabase
     .from('worklog_profiles')

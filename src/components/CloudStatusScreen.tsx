@@ -1,3 +1,4 @@
+import { BrandMark } from './BrandMark'
 import { Icon } from './Icon'
 import styles from './CloudStatusScreen.module.scss'
 
@@ -13,20 +14,7 @@ interface CloudStatusScreenProps {
 function Brand() {
   return (
     <div className={styles.brand}>
-      <span className={styles.mark} aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none">
-          <circle
-            cx="12"
-            cy="12"
-            r="7.6"
-            stroke="currentColor"
-            strokeWidth="1.7"
-            strokeOpacity="0.5"
-          />
-          <path d="M12 12V7.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-          <path d="M12 12l3.1 2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-        </svg>
-      </span>
+      <BrandMark size={32} className={styles.brandMark} />
       <span className={styles.brandText}>
         <strong>Worklog</strong>
         <span>工时记录</span>
@@ -96,12 +84,6 @@ export function CloudStatusScreen({
             ) : null}
           </div>
         ) : null}
-
-        <p className={styles.footer}>
-          {tone === 'error'
-            ? '记录仍在云端，不会因为这次失败丢失。'
-            : '数据只存放在你的 Supabase 项目里。'}
-        </p>
       </section>
     </main>
   )

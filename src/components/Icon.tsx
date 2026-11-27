@@ -21,6 +21,7 @@ export type IconName =
   | 'arrowLeft'
   | 'cloud'
   | 'logout'
+  | 'monitor'
 
 const PATHS: Record<IconName, ReactNode> = {
   play: (
@@ -87,6 +88,12 @@ const PATHS: Record<IconName, ReactNode> = {
     <>
       <path d="M14.5 8V5.8A1.8 1.8 0 0 0 12.7 4H6.3a1.8 1.8 0 0 0-1.8 1.8v12.4A1.8 1.8 0 0 0 6.3 20h6.4a1.8 1.8 0 0 0 1.8-1.8V16" />
       <path d="M9.5 12H21M17.5 8.5 21 12l-3.5 3.5" />
+    </>
+  ),
+  monitor: (
+    <>
+      <rect x="3.5" y="4.8" width="17" height="12.4" rx="2.6" />
+      <path d="M9 20.2h6M12 17.2v3" />
     </>
   ),
 }

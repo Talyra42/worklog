@@ -234,10 +234,7 @@ export function RecordsView() {
       <section className={styles.dataCard}>
         <div className={styles.dataIntro}>
           <h2>数据与备份</h2>
-          <p>
-            记录保存在你的 Supabase
-            项目里，登录同一个账号就能在别的设备继续。浏览器不再保存工时副本；需要离线留存时，可以随时导出备份。
-          </p>
+          <p>建议定期导出一份备份；换账号、清理浏览器或迁移数据时，可以用它恢复记录。</p>
         </div>
         <div className={styles.dataActions}>
           <button type="button" className={styles.dataButton} onClick={handleExportJson}>

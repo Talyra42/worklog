@@ -15,3 +15,4 @@ export interface ActiveSession {
 export type View = 'today' | 'month' | 'records'
 
 export type Theme = 'light' | 'dark'
+export type ThemeMode = 'system' | 'light' | 'dark'

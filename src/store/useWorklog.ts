@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { ActiveSession, Session, Theme, View } from '../types'
+import type { ActiveSession, Session, Theme, ThemeMode, View } from '../types'
 import { uid } from '../lib/id'
 import {
   activeFromRow,
@@ -26,40 +26,31 @@ export const DEFAULT_GOAL_MINUTES = 8 * 60
 export const MIN_GOAL_MINUTES = 60
 export const MAX_GOAL_MINUTES = 16 * 60
 
-/** UI preference cache; worklog data itself is never persisted in the browser. */
-const THEME_KEY = 'worklog.theme'
+/** UI preference key; worklog data itself is never persisted in the browser. */
+const THEME_MODE_KEY = 'worklog.themeMode'
 
 export type SyncStatus = 'idle' | 'loading' | 'ready' | 'error'
 export type RealtimeStatus = 'offline' | 'connecting' | 'live'
 
-const initialTheme = (): Theme => {
+const systemTheme = (): Theme =>
+  window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+
+const readThemeMode = (): ThemeMode => {
   try {
-    const stored = localStorage.getItem(THEME_KEY)
-    if (stored === 'light' || stored === 'dark') return stored
-    const legacy = localStorage.getItem('worklog.store.v1')
-    if (legacy) {
-      const parsed = JSON.parse(legacy) as { state?: { theme?: unknown } }
-      if (parsed.state?.theme === 'light' || parsed.state?.theme === 'dark') {
-        return parsed.state.theme
-      }
-    }
+    const stored = localStorage.getItem(THEME_MODE_KEY)
+    if (stored === 'system' || stored === 'light' || stored === 'dark') return stored
   } catch {
     /* localStorage can be unavailable in private mode */
   }
-  if (document.documentElement.dataset.theme === 'dark') return 'dark'
-  if (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    return 'dark'
-  }
-  return 'light'
+  return 'system'
 }
+
+const resolveTheme = (mode: ThemeMode): Theme => (mode === 'system' ? systemTheme() : mode)
 
 const applyTheme = (theme: Theme) => {
   document.documentElement.dataset.theme = theme
-  try {
-    localStorage.setItem(THEME_KEY, theme)
-  } catch {
-    /* ignore */
-  }
+  const meta = document.querySelector('meta[name="theme-color"]')
+  if (meta) meta.setAttribute('content', theme === 'dark' ? '#0a0f16' : '#eef4fb')
 }
 
 const byStart = (a: Session, b: Session) => a.start - b.start
@@ -93,6 +84,7 @@ interface WorklogState {
   active: ActiveSession | null
   dailyGoalMinutes: number
   theme: Theme
+  themeMode: ThemeMode
   view: View
   /** Month shown by the monthly view, `YYYY-MM`. */
   month: string
@@ -122,8 +114,8 @@ interface WorklogState {
   clearSessions: () => Promise<boolean>
 
   setGoal: (minutes: number) => Promise<void>
-  setTheme: (theme: Theme) => void
-  toggleTheme: () => void
+  setThemeMode: (mode: ThemeMode) => void
+  refreshSystemTheme: () => void
   setView: (view: View) => void
   setMonth: (month: string) => void
 
@@ -137,21 +129,15 @@ export const useWorklog = create<WorklogState>()((set, get) => {
   const toastError = (error: unknown, fallback?: string) =>
     useToast.getState().push(cloudMessage(error, fallback), 'danger')
 
-  const persistProfile = (
-    userId: string,
-    patch: Partial<Pick<ProfileRow, 'daily_goal_minutes' | 'theme'>>,
-  ) => {
-    void updateProfile(userId, patch).catch(() => {
-      /* Theme/goal failures are surfaced by the caller when they matter. */
-    })
-  }
+  const bootThemeMode = readThemeMode()
 
   return {
     userId: null,
     sessions: [],
     active: null,
     dailyGoalMinutes: DEFAULT_GOAL_MINUTES,
-    theme: initialTheme(),
+    theme: resolveTheme(bootThemeMode),
+    themeMode: bootThemeMode,
     view: 'today',
     month: monthKey(Date.now()),
 
@@ -165,14 +151,12 @@ export const useWorklog = create<WorklogState>()((set, get) => {
       try {
         const snapshot = await fetchCloud(userId)
         if (get().userId !== userId) return
-        const profile = snapshot.profile ?? (await ensureProfile(userId, get().theme))
+        const profile = snapshot.profile ?? (await ensureProfile(userId))
         if (get().userId !== userId) return
 
-        applyTheme(profile.theme)
         set({
           ...splitRows(snapshot.rows),
           dailyGoalMinutes: profile.daily_goal_minutes,
-          theme: profile.theme,
           status: 'ready',
           loadError: null,
         })
@@ -195,11 +179,9 @@ export const useWorklog = create<WorklogState>()((set, get) => {
         const snapshot = await fetchCloud(userId)
         if (get().userId !== userId || !snapshot.profile) return
         if (remoteRevision !== revision) return
-        applyTheme(snapshot.profile.theme)
         set({
           ...splitRows(snapshot.rows),
           dailyGoalMinutes: snapshot.profile.daily_goal_minutes,
-          theme: snapshot.profile.theme,
           status: 'ready',
           loadError: null,
         })
@@ -443,14 +425,24 @@ export const useWorklog = create<WorklogState>()((set, get) => {
       }
     },
 
-    setTheme: (theme) => {
+    setThemeMode: (themeMode) => {
+      const theme = resolveTheme(themeMode)
       applyTheme(theme)
-      set({ theme })
-      const userId = get().userId
-      if (userId) persistProfile(userId, { theme })
+      try {
+        localStorage.setItem(THEME_MODE_KEY, themeMode)
+      } catch {
+        /* ignore */
+      }
+      set({ themeMode, theme })
     },
 
-    toggleTheme: () => get().setTheme(get().theme === 'dark' ? 'light' : 'dark'),
+    refreshSystemTheme: () => {
+      if (get().themeMode !== 'system') return
+      const theme = systemTheme()
+      if (theme === get().theme) return
+      applyTheme(theme)
+      set({ theme })
+    },
 
     setView: (view) => set({ view }),
 
@@ -500,10 +492,6 @@ export const useWorklog = create<WorklogState>()((set, get) => {
             Math.max(MIN_GOAL_MINUTES, Math.round(goal)),
           ),
         })
-      }
-      if (row.theme === 'light' || row.theme === 'dark') {
-        applyTheme(row.theme)
-        set({ theme: row.theme })
       }
     },
   }

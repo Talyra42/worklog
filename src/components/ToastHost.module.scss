@@ -58,11 +58,17 @@
   }
 }
 
+@media (max-width: 900px) {
+  .host {
+    bottom: calc(82px + env(safe-area-inset-bottom));
+  }
+}
+
 @media (max-width: 640px) {
   .host {
     right: 16px;
     left: 16px;
-    bottom: 16px;
+    bottom: calc(82px + env(safe-area-inset-bottom));
     align-items: stretch;
   }
 
