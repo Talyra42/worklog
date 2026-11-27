@@ -13,6 +13,7 @@
 create table if not exists public.worklog_profiles (
   user_id uuid primary key references auth.users (id) on delete cascade,
   daily_goal_minutes integer not null default 480,
+  -- Legacy column kept for compatibility; current UI stores the theme locally.
   theme text not null default 'light',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),

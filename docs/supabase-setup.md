@@ -70,6 +70,8 @@ Worklog 是纯静态 SPA，Vercel 只负责托管文件，**不会转发 Supabas
    - 关闭后，注册完立即登录，最省事。
    - 保持开启也可以：注册后去邮箱点验证链接，会跳回 `Site URL`，客户端会自动完成登录。
 
+> **个人使用建议**：注册好自己的账号后，回到这里把 **Allow new users to sign up** 关掉。已有账号登录、刷新 token 和同步都不受影响；以后要加新账号再临时打开即可。
+
 ## 4. 配置 Site URL（邮箱验证 / 后续找回密码需要）
 
 **Authentication** → **URL Configuration**：
@@ -113,6 +115,7 @@ VITE_SUPABASE_ANON_KEY=你的-publishable-或-anon-key
 - [ ] Table Editor 里能看到 `worklog_sessions` 和 `worklog_profiles`
 - [ ] Database → Replication 里能看到这两张表
 - [ ] Authentication → Sign In / Providers → Email 已启用
+- [ ] （个人使用）注册完自己的账号后，已关闭 Allow new users to sign up
 - [ ] `.env.local` 里两个变量都有值（没有引号、没有多余空格）
 - [ ] 改完 `.env.local` 后重启了 `pnpm dev`
 

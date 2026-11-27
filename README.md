@@ -79,7 +79,7 @@ cp .env.example .env.local
 pnpm dev        # http://localhost:5173
 ```
 
-首次打开会看到登录页，注册一个账号即可。生产构建与预览：
+首次打开会看到登录页，注册一个账号即可。个人使用可以在注册后关闭 Supabase 的新用户注册。生产构建与预览：
 
 ```bash
 pnpm build
@@ -148,7 +148,7 @@ src/
 ├── views/        今日 / 月度 / 记录
 ├── store/        Zustand：云端数据、登录态、弹窗、Toast
 ├── lib/          时间工具、统计、Supabase 数据访问、备份
-├── hooks/        useNow、useCloudSync（实时订阅）
+├── hooks/        useNow、useCloudSync、useSyncStatus
 ├── styles/       主题变量与全局样式
 └── ...
 supabase/
