@@ -149,14 +149,14 @@ pnpm dev
 
 1. 在 Vercel 项目 → **Settings → Environment Variables** 添加：
    - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_ANON_KEY`
+   - `VITE_SUPABASE_PUBLISHABLE_KEY`（旧项目也可以叫 `VITE_SUPABASE_ANON_KEY`，代码两个名字都认）
      两个环境都加上（Production / Preview），然后重新部署。Vite 会在构建时把这些值写进静态文件；`VITE_` 变量本来就是公开的。
 2. 去 Supabase → **Authentication → URL Configuration**：
-   - **Site URL** 改成你的线上地址，例如 `https://worklog.vercel.app`；
-   - **Redirect URLs** 加上 `https://worklog.vercel.app/**`；
+   - **Site URL** 改成你的线上地址，例如 `https://worklog.talyra42.top`；
+   - **Redirect URLs** 加上 `https://worklog.talyra42.top/**`；
    - 本地开发地址 `http://localhost:5173/**` 也可以保留。
 3. **不需要**在 Vercel 配 rewrite 或 serverless 代理。Supabase 请求由浏览器直连，代理反而会让 Realtime WebSocket 变复杂；也不要把 `service_role` / secret key 放到 `VITE_` 变量里。
-4. 预览部署（preview）如果也要登录，把对应的 `https://*.vercel.app` 域名加进 Redirect URLs，或者固定用生产域名测试。
+4. 预览部署（preview）如果也要登录，把对应的 `https://*.vercel.app` 域名加进 Redirect URLs，或者固定用生产域名 `https://worklog.talyra42.top` 测试。
 
 ---
 

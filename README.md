@@ -14,6 +14,9 @@
 [![Zustand 5](https://img.shields.io/badge/Zustand-5-2f2f2f?style=flat-square)](https://zustand.docs.pmnd.rs)
 [![Supabase](https://img.shields.io/badge/cloud-Supabase-3ecf8e?logo=supabase&logoColor=white&style=flat-square)](https://supabase.com)
 [![SCSS Modules](https://img.shields.io/badge/SCSS-Modules-CF649A?logo=sass&logoColor=white&style=flat-square)](https://sass-lang.com)
+[![Live](https://img.shields.io/badge/live-worklog.talyra42.top-c44a23?style=flat-square&logo=vercel&logoColor=white)](https://worklog.talyra42.top)
+
+<sub>在线使用：<a href="https://worklog.talyra42.top">worklog.talyra42.top</a></sub>
 
 <sub><a href="#功能">功能</a> · <a href="#快速开始">快速开始</a> · <a href="#数据与隐私">数据说明</a> · <a href="#技术栈">技术栈</a></sub>
 
