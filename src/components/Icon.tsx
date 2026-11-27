@@ -19,6 +19,8 @@ export type IconName =
   | 'check'
   | 'alert'
   | 'arrowLeft'
+  | 'cloud'
+  | 'logout'
 
 const PATHS: Record<IconName, ReactNode> = {
   play: (
@@ -75,6 +77,18 @@ const PATHS: Record<IconName, ReactNode> = {
     </>
   ),
   arrowLeft: <path d="M19 12H5M10.5 6.5 5 12l5.5 5.5" />,
+  cloud: (
+    <>
+      <path d="M7.4 18.5a4.4 4.4 0 0 1-.4-8.8 6 6 0 0 1 11.5.9 3.9 3.9 0 0 1-.3 7.9z" />
+      <path d="M9.5 14.5h5" />
+    </>
+  ),
+  logout: (
+    <>
+      <path d="M14.5 8V5.8A1.8 1.8 0 0 0 12.7 4H6.3a1.8 1.8 0 0 0-1.8 1.8v12.4A1.8 1.8 0 0 0 6.3 20h6.4a1.8 1.8 0 0 0 1.8-1.8V16" />
+      <path d="M9.5 12H21M17.5 8.5 21 12l-3.5 3.5" />
+    </>
+  ),
 }
 
 export interface IconProps extends Omit<SVGProps<SVGSVGElement>, 'name'> {

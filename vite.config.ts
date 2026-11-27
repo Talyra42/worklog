@@ -9,4 +9,6 @@ export default defineConfig({
       localsConvention: 'camelCaseOnly',
     },
   },
+  // Supabase adds ~150 kB gzip to the main bundle; keep the build log quiet.
+  build: { chunkSizeWarningLimit: 600 },
 })

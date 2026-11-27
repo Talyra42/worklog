@@ -195,6 +195,14 @@
   transform: translateY(0);
 }
 
+.start:disabled,
+.stop:disabled {
+  opacity: 0.62;
+  box-shadow: none;
+  cursor: progress;
+  transform: none;
+}
+
 .ghost {
   display: inline-flex;
   align-items: center;

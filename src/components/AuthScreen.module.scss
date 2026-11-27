@@ -1,0 +1,379 @@
+.page {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  min-height: 100dvh;
+}
+
+.story {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 48px;
+  overflow: hidden;
+  padding: clamp(26px, 5vw, 60px);
+  border-right: 1px solid var(--line);
+  background:
+    radial-gradient(680px 500px at 10% 6%, var(--accent-glow), transparent 70%),
+    linear-gradient(155deg, var(--bg-elevated), var(--surface-soft));
+}
+
+.story::after {
+  content: '';
+  position: absolute;
+  right: -150px;
+  bottom: -190px;
+  width: 460px;
+  height: 460px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 46px color-mix(in srgb, var(--line) 55%, transparent),
+    0 0 0 92px color-mix(in srgb, var(--line) 28%, transparent);
+  pointer-events: none;
+}
+
+.brand {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.mark {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  box-shadow: 0 10px 22px -12px var(--accent);
+}
+
+.mark svg {
+  width: 25px;
+  height: 25px;
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.brandText strong {
+  font-size: 15px;
+  font-weight: 620;
+  letter-spacing: -0.01em;
+}
+
+.brandText span {
+  color: var(--faint);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+}
+
+.storyBody {
+  position: relative;
+  z-index: 1;
+  max-width: 510px;
+}
+
+.eyebrow {
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+}
+
+.storyBody h1 {
+  margin-top: 14px;
+  font-size: clamp(34px, 4.6vw, 52px);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.045em;
+}
+
+.lede {
+  max-width: 34ch;
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 14.5px;
+  line-height: 1.7;
+}
+
+.benefits {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 38px;
+}
+
+.benefits li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.benefitIcon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  margin-top: 1px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.benefitText {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.benefitText strong {
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.benefitText small {
+  color: var(--faint);
+  font-size: 12.5px;
+}
+
+.storyFoot {
+  position: relative;
+  z-index: 1;
+  color: var(--faint);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+}
+
+.formSide {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 44px 24px;
+}
+
+.themeToggle {
+  position: absolute;
+  top: 22px;
+  right: 26px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--muted);
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.themeToggle:hover {
+  border-color: var(--line-strong);
+  background: var(--surface-soft);
+}
+
+.card {
+  width: min(392px, 100%);
+}
+
+.heading h2 {
+  font-size: 27px;
+  font-weight: 620;
+  letter-spacing: -0.03em;
+}
+
+.heading p {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 28px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+
+.field input {
+  height: 45px;
+  padding: 0 13px;
+  border: 1px solid var(--line-strong);
+  border-radius: 11px;
+  background: var(--surface-strong);
+  font-size: 14px;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.field input::placeholder {
+  color: var(--faint);
+}
+
+.field input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.error,
+.notice {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  line-height: 1.55;
+  text-align: left;
+}
+
+.error {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.notice {
+  background: var(--ok-soft);
+  color: var(--ok);
+}
+
+.submit {
+  height: 46px;
+  margin-top: 3px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 14px;
+  font-weight: 560;
+  transition:
+    background-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.submit:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.submit:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.submit:disabled {
+  opacity: 0.62;
+  cursor: progress;
+}
+
+.switch {
+  margin-top: 22px;
+  color: var(--faint);
+  font-size: 12.5px;
+  text-align: center;
+}
+
+.switch button {
+  margin-left: 5px;
+  color: var(--accent);
+  font-size: 12.5px;
+  font-weight: 550;
+}
+
+.switch button:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.privacy {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 34px;
+  color: var(--faint);
+  font-size: 11.5px;
+}
+
+@media (max-width: 940px) {
+  .page {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .story {
+    gap: 18px;
+    padding: 22px 22px 26px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .story::after {
+    right: -190px;
+    bottom: -280px;
+  }
+
+  .storyBody {
+    max-width: none;
+  }
+
+  .eyebrow,
+  .lede,
+  .benefits,
+  .storyFoot {
+    display: none;
+  }
+
+  .storyBody h1 {
+    margin-top: 0;
+    font-size: 26px;
+    letter-spacing: -0.035em;
+  }
+
+  .formSide {
+    padding: 34px 20px 48px;
+  }
+
+  .themeToggle {
+    top: -52px;
+    right: 18px;
+    border-color: transparent;
+    background: transparent;
+  }
+}
+
+@media (max-width: 560px) {
+  .story {
+    padding: 18px 18px 22px;
+  }
+
+  .storyBody h1 {
+    font-size: 23px;
+  }
+
+  .formSide {
+    padding: 28px 18px 42px;
+  }
+
+  .heading h2 {
+    font-size: 24px;
+  }
+}

@@ -14,6 +14,8 @@ interface RingTimerProps {
   onPunch: () => void
   onCreate: () => void
   onGoalChange: (minutes: number) => void
+  /** A cloud write is in flight; block another punch. */
+  busy?: boolean
 }
 
 export function RingTimer({
@@ -24,6 +26,7 @@ export function RingTimer({
   onPunch,
   onCreate,
   onGoalChange,
+  busy = false,
 }: RingTimerProps) {
   const isActive = activeStart !== null
   const activeMs = isActive ? Math.max(0, now - activeStart) : 0
@@ -75,7 +78,12 @@ export function RingTimer({
         </p>
 
         <div className={styles.actions}>
-          <button type="button" className={isActive ? styles.stop : styles.start} onClick={onPunch}>
+          <button
+            type="button"
+            className={isActive ? styles.stop : styles.start}
+            onClick={onPunch}
+            disabled={busy}
+          >
             <Icon name={isActive ? 'stop' : 'play'} size={17} />
             {isActive ? '结束工作' : '开始工作'}
           </button>

@@ -3,6 +3,7 @@ import { Icon } from '../components/Icon'
 import { SessionRow } from '../components/SessionRow'
 import { useNow } from '../hooks/useNow'
 import { buildBackup, downloadFile, parseBackup, toCsv } from '../lib/backup'
+import { markLegacyImported, readLegacySessions } from '../lib/legacy'
 import { sortByStart, totalMs } from '../lib/stats'
 import {
   dateKey,
@@ -20,9 +21,11 @@ import styles from './RecordsView.module.scss'
 
 export function RecordsView() {
   const sessions = useWorklog((state) => state.sessions)
+  const active = useWorklog((state) => state.active)
   const goalMinutes = useWorklog((state) => state.dailyGoalMinutes)
   const importSessions = useWorklog((state) => state.importSessions)
   const clearSessions = useWorklog((state) => state.clearSessions)
+  const setGoal = useWorklog((state) => state.setGoal)
   const deleteSession = useWorklog((state) => state.deleteSession)
   const openEditor = useUi((state) => state.openEditor)
   const askConfirm = useUi((state) => state.askConfirm)
@@ -32,6 +35,7 @@ export function RecordsView() {
   const now = tick
   const fileRef = useRef<HTMLInputElement>(null)
   const [filter, setFilter] = useState<string>('all')
+  const [legacy, setLegacy] = useState<Session[]>(() => readLegacySessions())
 
   const monthOptions = useMemo(() => {
     const months = new Set<string>()
@@ -93,8 +97,12 @@ export function RecordsView() {
         description: `文件里找到 ${parsed.sessions.length} 段记录，已经存在的会自动跳过。`,
         confirmLabel: '导入',
         onConfirm: () => {
-          const added = importSessions(parsed.sessions)
-          pushToast(added > 0 ? `已导入 ${added} 段记录` : '没有新的记录可导入')
+          void (async () => {
+            const added = await importSessions(parsed.sessions)
+            if (added < 0) return
+            if (parsed.dailyGoalMinutes) await setGoal(parsed.dailyGoalMinutes)
+            pushToast(added > 0 ? `已导入 ${added} 段记录` : '没有新的记录可导入')
+          })()
         },
       })
     } catch (error) {
@@ -102,15 +110,36 @@ export function RecordsView() {
     }
   }
 
+  const handleLegacyImport = () => {
+    if (legacy.length === 0) return
+    askConfirm({
+      title: '导入本机旧数据？',
+      description: `在浏览器里找到 ${legacy.length} 段旧版本记录，导入后会按 id 去重，本机原数据不会被删除。`,
+      confirmLabel: '导入',
+      onConfirm: () => {
+        void (async () => {
+          const added = await importSessions(legacy)
+          if (added < 0) return
+          markLegacyImported()
+          setLegacy([])
+          pushToast(added > 0 ? `已导入 ${added} 段旧记录` : '旧记录已经全部在云端了')
+        })()
+      },
+    })
+  }
+
   const handleClear = () => {
     askConfirm({
       title: '清空全部记录？',
-      description: `将删除 ${sessions.length} 段记录，且无法恢复。建议先导出备份。`,
+      description: active
+        ? `将删除 ${sessions.length} 段记录和正在进行的计时，且无法恢复。建议先导出备份。`
+        : `将删除 ${sessions.length} 段记录，且无法恢复。建议先导出备份。`,
       confirmLabel: '清空',
       tone: 'danger',
       onConfirm: () => {
-        clearSessions()
-        pushToast('已清空全部记录')
+        void clearSessions().then((ok) => {
+          if (ok) pushToast('已清空全部记录')
+        })
       },
     })
   }
@@ -122,8 +151,9 @@ export function RecordsView() {
       confirmLabel: '删除',
       tone: 'danger',
       onConfirm: () => {
-        deleteSession(session.id)
-        pushToast('记录已删除')
+        void deleteSession(session.id).then((ok) => {
+          if (ok) pushToast('记录已删除')
+        })
       },
     })
   }
@@ -205,7 +235,8 @@ export function RecordsView() {
         <div className={styles.dataIntro}>
           <h2>数据与备份</h2>
           <p>
-            记录只保存在本机浏览器里，不会上传。清理浏览器数据或换设备之前，记得先导出一份备份。
+            记录保存在你的 Supabase
+            项目里，登录同一个账号就能在别的设备继续。浏览器不再保存工时副本；需要离线留存时，可以随时导出备份。
           </p>
         </div>
         <div className={styles.dataActions}>
@@ -225,11 +256,17 @@ export function RecordsView() {
             <Icon name="upload" size={15} />
             导入 JSON
           </button>
+          {legacy.length > 0 ? (
+            <button type="button" className={styles.dataButton} onClick={handleLegacyImport}>
+              <Icon name="upload" size={15} />
+              导入本机旧数据（{legacy.length}）
+            </button>
+          ) : null}
           <button
             type="button"
             className={`${styles.dataButton} ${styles.danger}`}
             onClick={handleClear}
-            disabled={sessions.length === 0}
+            disabled={sessions.length === 0 && !active}
           >
             <Icon name="trash" size={15} />
             清空全部

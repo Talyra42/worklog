@@ -34,6 +34,7 @@ export function TodayView() {
   const discardActive = useWorklog((state) => state.discardActive)
   const deleteSession = useWorklog((state) => state.deleteSession)
   const setGoal = useWorklog((state) => state.setGoal)
+  const syncing = useWorklog((state) => state.syncing)
   const openEditor = useUi((state) => state.openEditor)
   const askConfirm = useUi((state) => state.askConfirm)
   const pushToast = useToast((state) => state.push)
@@ -62,7 +63,7 @@ export function TodayView() {
   const suspicious = active !== null && activeMs > SUSPICIOUS_MS
 
   const handlePunch = () => {
-    punch()
+    void punch()
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
   }
 
@@ -74,7 +75,7 @@ export function TodayView() {
       if (target?.closest('input, textarea, select, button, [contenteditable="true"]')) return
       if (document.querySelector('dialog[open]')) return
       event.preventDefault()
-      punch()
+      void punch()
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
@@ -87,8 +88,9 @@ export function TodayView() {
       confirmLabel: '删除',
       tone: 'danger',
       onConfirm: () => {
-        deleteSession(session.id)
-        pushToast('记录已删除')
+        void deleteSession(session.id).then((ok) => {
+          if (ok) pushToast('记录已删除')
+        })
       },
     })
   }
@@ -100,8 +102,7 @@ export function TodayView() {
       confirmLabel: '作废',
       tone: 'danger',
       onConfirm: () => {
-        discardActive()
-        pushToast('已作废这段计时')
+        void discardActive().then(() => pushToast('已作废这段计时'))
       },
     })
   }
@@ -132,10 +133,10 @@ export function TodayView() {
             </p>
           </div>
           <div className={styles.recoveryActions}>
-            <button type="button" onClick={() => stopActive(now)}>
+            <button type="button" onClick={() => void stopActive(now)} disabled={syncing > 0}>
               结束于现在
             </button>
-            <button type="button" onClick={handleDiscard}>
+            <button type="button" onClick={handleDiscard} disabled={syncing > 0}>
               作废
             </button>
           </div>
@@ -150,6 +151,7 @@ export function TodayView() {
         onPunch={handlePunch}
         onCreate={() => openEditor({ defaultDate: dateKey(now) })}
         onGoalChange={setGoal}
+        busy={syncing > 0}
       />
 
       <div className={styles.stats}>

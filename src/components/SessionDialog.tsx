@@ -27,6 +27,7 @@ export function SessionDialog() {
 
   const [form, setForm] = useState<SessionDraft>(editor.draft)
   const [error, setError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
   const { session } = editor
 
   const startTs = form.date && form.start ? toTimestamp(form.date, form.start) : Number.NaN
@@ -41,8 +42,9 @@ export function SessionDialog() {
     setError(null)
   }
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    if (submitting) return
 
     if (!form.date || !form.start || !form.end) {
       setError('请填写完整的日期和时间')
@@ -71,19 +73,31 @@ export function SessionDialog() {
       return
     }
 
-    if (session) {
-      updateSession(session.id, { start: startTs, end: endTs })
-      pushToast('记录已更新', 'success')
-    } else {
-      addSession({ id: uid(), start: startTs, end: endTs })
-      pushToast('已补录一段记录', 'success')
+    setSubmitting(true)
+    const ok = session
+      ? await updateSession(session.id, { start: startTs, end: endTs })
+      : await addSession({ id: uid(), start: startTs, end: endTs })
+
+    if (!ok) {
+      setSubmitting(false)
+      setError('没能保存到云端，请检查网络后重试')
+      return
     }
+
+    setSubmitting(false)
+    pushToast(session ? '记录已更新' : '已补录一段记录', 'success')
     closeEditor()
   }
 
-  const handleDelete = () => {
-    if (!session) return
-    deleteSession(session.id)
+  const handleDelete = async () => {
+    if (!session || submitting) return
+    setSubmitting(true)
+    const ok = await deleteSession(session.id)
+    if (!ok) {
+      setSubmitting(false)
+      setError('删除失败，请稍后再试')
+      return
+    }
     pushToast('记录已删除', 'success')
     closeEditor()
   }
@@ -100,7 +114,8 @@ export function SessionDialog() {
             <button
               type="button"
               className={`${styles.button} ${styles.delete}`}
-              onClick={handleDelete}
+              onClick={() => void handleDelete()}
+              disabled={submitting}
             >
               删除
             </button>
@@ -109,6 +124,7 @@ export function SessionDialog() {
             type="button"
             className={`${styles.button} ${styles.ghost}`}
             onClick={closeEditor}
+            disabled={submitting}
           >
             取消
           </button>
@@ -116,8 +132,9 @@ export function SessionDialog() {
             type="submit"
             form="session-form"
             className={`${styles.button} ${styles.primary}`}
+            disabled={submitting}
           >
-            保存
+            {submitting ? '保存中…' : '保存'}
           </button>
         </>
       }

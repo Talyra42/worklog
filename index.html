@@ -12,10 +12,20 @@
       ;(() => {
         let theme = null
         try {
-          const raw = localStorage.getItem('worklog.store.v1')
-          if (raw) theme = JSON.parse(raw).state.theme
+          const stored = localStorage.getItem('worklog.theme')
+          if (stored === 'light' || stored === 'dark') theme = stored
         } catch {
           /* ignore */
+        }
+        if (!theme) {
+          try {
+            const legacy = JSON.parse(localStorage.getItem('worklog.store.v1') || 'null')
+            if (legacy?.state?.theme === 'light' || legacy?.state?.theme === 'dark') {
+              theme = legacy.state.theme
+            }
+          } catch {
+            /* ignore */
+          }
         }
         if (theme !== 'light' && theme !== 'dark') {
           theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'

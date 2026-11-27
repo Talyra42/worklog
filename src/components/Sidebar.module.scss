@@ -114,6 +114,88 @@
   padding: 0 4px;
 }
 
+.accountBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 8px 7px 11px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--surface);
+}
+
+.sync {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+
+.dot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--faint);
+}
+
+.sync[data-state='ok'] .dot {
+  background: var(--ok);
+  box-shadow: 0 0 0 3px var(--ok-soft);
+}
+
+.sync[data-state='busy'] .dot {
+  background: var(--accent);
+  animation: sync-pulse 1.2s ease-in-out infinite;
+}
+
+.sync[data-state='warn'] .dot {
+  background: var(--accent);
+}
+
+@keyframes sync-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+.signOut {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 25px;
+  height: 25px;
+  border-radius: 7px;
+  color: var(--faint);
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.signOut:hover {
+  background: var(--surface-soft);
+  color: var(--accent);
+}
+
+.email {
+  overflow: hidden;
+  padding: 0 4px;
+  color: var(--faint);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .theme {
   display: inline-flex;
   align-items: center;
@@ -193,8 +275,29 @@
   }
 
   .footer {
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
     margin: 0;
     padding: 0;
+  }
+
+  .accountBar {
+    gap: 2px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .syncLabel,
+  .email,
+  .note {
+    display: none;
+  }
+
+  .signOut {
+    width: 30px;
+    height: 30px;
   }
 
   .theme {
@@ -202,8 +305,7 @@
     border-radius: 10px;
   }
 
-  .themeLabel,
-  .note {
+  .themeLabel {
     display: none;
   }
 }

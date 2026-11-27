@@ -64,8 +64,9 @@ export function MonthView() {
       confirmLabel: '删除',
       tone: 'danger',
       onConfirm: () => {
-        deleteSession(session.id)
-        pushToast('记录已删除')
+        void deleteSession(session.id).then((ok) => {
+          if (ok) pushToast('记录已删除')
+        })
       },
     })
   }
